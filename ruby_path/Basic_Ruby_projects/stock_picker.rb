@@ -8,7 +8,6 @@
 def stock_picker(stocks)
 max_profit = 0   
 possible_combinations = stocks.combination(2).to_a
-possible_combinations
 best_days = nil
 possible_combinations.each do |combination|
     profit = combination[1] - combination[0]
@@ -17,7 +16,7 @@ possible_combinations.each do |combination|
         best_days = [stocks.index(combination[0]), stocks.index(combination[1])]
     end
 end
-print best_days , " for a profit of #{stocks[best_days[1]]} - #{stocks[best_days[0]]} == #{max_profit} "
+p best_days , " for a profit of #{stocks[best_days[1]]} - #{stocks[best_days[0]]} == #{max_profit} "
 best_days
 end
  stock_picker([17,3,6,9,15,8,6,1,10])
