@@ -12,8 +12,6 @@ best_days = nil
 possible_combinations.each do |combination|
     buy_index = stocks.index(combination[0])
     sell_index = stocks.index(combination[1])
-    next if buy_index >= sell_index
-
     profit = combination[1] - combination[0]
     if max_profit < profit
         max_profit = profit
