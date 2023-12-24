@@ -26,18 +26,11 @@ MAX_BOTTLES = 99
       end
     end
 
-    def verses(num1, num2)
-        reversed = (num2..num1).to_a.reverse
-        reversed = reversed.inject("") do |string, element|
-        string + verse(element) + "\n"
-        end 
-        reversed.chomp
+    def verses(highest_verse, lowest_verse)
+      (highest_verse).downto(lowest_verse).map {|verse_occurence| verse(verse_occurence) + "\n"}.join
     end 
 
     def song
-      verses(99,0)
+      verses(MAX_BOTTLES,0)
     end
 end
-
-a = Bottles.new
-puts a.song
