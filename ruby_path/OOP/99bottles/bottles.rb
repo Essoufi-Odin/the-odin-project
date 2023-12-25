@@ -1,36 +1,59 @@
 class Bottles
-MAX_BOTTLES = 99
-    def verse(num)
 
-      case num
-      when 0
-        "No more bottles of beer on the wall, " +
-        "no more bottles of beer.\n" +
-        "Go to the store and buy some more, " +
-        "#{MAX_BOTTLES} bottles of beer on the wall.\n"
-      when 1
-        "#{num} bottle of beer on the wall, " +
-        "#{num} bottle of beer.\n" +
-        "Take it down and pass it around, "+
-        "no more bottles of beer on the wall.\n"
-      when 2
-        "#{num} bottles of beer on the wall, " +
-        "#{num} bottles of beer.\n" +
-        "Take one down and pass it around, "+
-        "#{num - 1} bottle of beer on the wall.\n" 
-      else
-        "#{num} bottles of beer on the wall, " +
-        "#{num} bottles of beer.\n" +
-        "Take one down and pass it around, " +
-        "#{num - 1} bottles of beer on the wall.\n" 
-      end
+  def verses(highest_verse, lowest_verse)
+    (highest_verse).downto(lowest_verse).map {|verse_occurence| verse(verse_occurence)}.join("\n")
+  end 
+  
+  def song
+    verses(99,0)
+  end
+
+  def verse(number)
+    
+    "#{quantity(number).capitalize} #{container(number)} of beer on the wall, " +
+    "#{quantity(number)} #{container(number)} of beer.\n" +
+    "#{action(number)}, " +
+    "#{quantity(successor(number))} #{container(number - 1)} of beer on the wall.\n" 
+  end
+
+  def container(number)
+    if number == 1
+      "bottle"
+    else
+      "bottles"
     end
+  end
 
-    def verses(highest_verse, lowest_verse)
-      (highest_verse).downto(lowest_verse).map {|verse_occurence| verse(verse_occurence) + "\n"}.join
-    end 
-
-    def song
-      verses(MAX_BOTTLES,0)
+  def pronoun(number)
+    if number == 1
+      "it"
+    else
+    "one"
     end
+  end
+
+  def quantity(number)
+    case number
+    when 0
+      "no more"
+    else
+      number.to_s
+    end  
+  end
+
+  def action(number)
+    if number == 0
+      "Go to the store and buy some more"
+    else
+      "Take #{pronoun(number)} down and pass it around"
+    end
+  end
+
+  def successor(number)
+    if number == 0
+      99
+    else
+      number - 1
+    end
+  end
 end
