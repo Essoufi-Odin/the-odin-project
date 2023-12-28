@@ -1,7 +1,7 @@
 class Bottles
 
-  def verses(highest_verse, lowest_verse)
-    (highest_verse).downto(lowest_verse).map {|verse_occurence| verse(verse_occurence)}.join("\n")
+  def verses(upper, lower)
+    (upper).downto(lower).map {|verse_occurence| verse(verse_occurence)}.join("\n")
   end 
   
   def song
@@ -9,14 +9,21 @@ class Bottles
   end
 
   def verse(number)
-    
-    "#{quantity(number).capitalize} #{container(number)} of beer on the wall, " +
-    "#{quantity(number)} #{container(number)} of beer.\n" +
-    "#{action(number)}, " +
-    "#{quantity(successor(number))} #{container(number - 1)} of beer on the wall.\n" 
+    bottle_number = BottleNumber.new(number)
+    next_bottle_number = BottleNumber.new(bottle_number.successor)
+    "#{bottle_number.quantity.capitalize} #{bottle_number.container} of beer on the wall, " +
+    "#{bottle_number.quantity} #{bottle_number.container} of beer.\n" +
+    "#{bottle_number.action}, " +
+    "#{quantity(next_bottle_number)} #{next_bottle_number.container} of beer on the wall.\n" 
   end
+end
 
-  def container(number)
+class BottleNumber
+  attr_reader :number
+  def initialize(number)
+    @number = number
+  end
+  def container
     if number == 1
       "bottle"
     else
@@ -24,32 +31,31 @@ class Bottles
     end
   end
 
-  def pronoun(number)
+  def pronoun
     if number == 1
       "it"
     else
-    "one"
+      "one"
     end
   end
 
-  def quantity(number)
-    case number
-    when 0
+  def quantity
+    if number == 0
       "no more"
     else
       number.to_s
     end  
   end
 
-  def action(number)
+  def action
     if number == 0
       "Go to the store and buy some more"
     else
-      "Take #{pronoun(number)} down and pass it around"
+      "Take #{pronoun} down and pass it around"
     end
   end
 
-  def successor(number)
+  def successor
     if number == 0
       99
     else
