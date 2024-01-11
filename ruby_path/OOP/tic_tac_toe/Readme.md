@@ -1,0 +1,1 @@
+to run in the console use : ruby game.rb
