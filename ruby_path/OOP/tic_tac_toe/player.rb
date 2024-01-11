@@ -1,5 +1,6 @@
 class Player
-    attr_reader :score, :name
+    attr_reader :name
+    attr_accessor :score
 
     def initialize(name)
         @name = name
@@ -16,13 +17,6 @@ class Player
         get_move
       end
     end
-
 end
 
-print "Player 1 : choose your name"
-player_one = gets.chomp
-player_one = Player.new(player_one)
-print "Player 2 : choose your name"
-player_two = gets.chomp
-player_two = Player.new(player_two)
 

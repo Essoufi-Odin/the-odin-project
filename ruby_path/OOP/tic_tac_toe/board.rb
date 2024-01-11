@@ -1,6 +1,6 @@
 class Board 
     attr_reader :board
-    attr_accessor :first_player, second_player
+    attr_accessor :first_player, :second_player
 
     def initialize(first_player, second_player)    
         @board = {first: Array.new(3) { |i| i + 1 },
@@ -17,8 +17,29 @@ class Board
       end
     end
     
-
-    private
+    def make_move_x(move, player)
+        @board.each do |key, row|
+         row.each_with_index do |element, index|
+             if element == move && element != "O" && element != "X"
+                 row[index] = "X"
+                 return true
+             end
+         end
+        end
+         false
+     end
+     
+     def make_move_o(move, player)
+         @board.each do |key, row|
+             row.each_with_index do |element, index|
+                 if element == move && element != "O"&& element != "X"
+                     row[index] = "O"
+                     return true
+                 end
+             end
+         end
+         false
+     end
 
     def wincon
       #check rows
@@ -35,10 +56,5 @@ class Board
       #if no wincon return false
       false
     end
-    
-end
 
- 
-  
-game = Board.new
-puts game
+end
