@@ -11,6 +11,7 @@ class Game
     def initialize
         @player = Player.new
         @computer = Computer.new
+        
     end
 
     def start
@@ -19,7 +20,16 @@ class Game
             choice = gets.chomp
             case choice
             when '1'
-                self.play()
+                print "press 1 to be codebreaker or 2 to be codemaker "
+                role = gets.chomp
+                case role
+                when '1'
+                    self.play_as_codebreaker()
+                when '2'
+                    self.play_as_codemaker()
+                else
+                    print "you gave me #{choice} i dont know what to do with that"
+                end
             when '0'
                 break
             else
@@ -29,7 +39,7 @@ class Game
     end
 
 
-    def play
+    def play_as_codebreaker
        
         select_color_4_times()
         12.times do
@@ -42,8 +52,36 @@ class Game
                 puts "you guessed correctly! "
                 break
             end 
-            
+              
         end
+        puts "you reached maximum amount of guessed. you lose! "
+    end
+
+    def play_as_codemaker
+        all_possible_codes = generate_codes()
+        player_choice = get_player_colors()
+        computer_colors_array = convert_code_to_color(1122)
+        feedback = give_feedback_computer(computer_colors_array, player_choice) 
+        all_possible_codes.select! { |code| feedback_match?(convert_code_to_color(code), feedback) }
+        if feedback == @@win
+            puts "you guessed correctly! "
+            return
+        end 
+        all_possible_codes.select! { |code| feedback_match?(code, feedback) }
+        11.times do
+            best_guess = find_best_guess(all_possible_codes)
+            puts "Computer's guess: #{convert_code_to_color(best_guess)}"
+            
+            feedback = give_feedback(best_guess)
+            all_possible_codes.select! { |code| feedback_match?(convert_code_to_color(code), feedback) }
+        
+            if feedback == @@win
+              puts "Computer guessed correctly!"
+              return
+            end
+        end
+        
+          puts "Computer reached the maximum number of guesses. It loses!"
     end
 
     private
@@ -59,6 +97,18 @@ class Game
             if self.computer.selected_colors[index] == player_colors_array[index] 
               feedback << "red peg"
             elsif self.computer.selected_colors.include?(color)
+              feedback << "white peg"
+            end
+        end
+        feedback
+    end
+
+    def give_feedback_to_computer(computer_colors_array, player_choice)
+        feedback = []
+        computer_colors_array.each_with_index do |color, index|
+            if player_choice[index] == computer_colors_array[index] 
+              feedback << "red peg"
+            elsif player_choice.include?(color)
               feedback << "white peg"
             end
         end
@@ -82,6 +132,48 @@ class Game
         end
         player_color_array
     end
+
+    def generate_codes
+        #create set of the 1296 possible codes
+        colors = (1..6).to_a
+        all_combinations = []
+        colors.each do |a|
+            colors.each do |b|
+                colors.each do |c|
+                    colors.each do |d|
+                        combination = "#{a}#{b}#{c}#{d}"
+                        all_combinations << combination
+                    end
+                end
+            end
+        end 
+        all_combinations
+    end
+
+    def convert_code_to_color(code)
+        
+      color = code.to_s.split("").map { |num| @@colors_to_choose_from[num.to_i - 1] }
+        
+    end
+
+
+    def convert_colors_to_code(colors)
+        code = ''
+        colors.each {|color|code += @@colors_to_choose_from.find_index(color).to_s}
+        code
+    end
+
+    def feedback_match?(code, expected_feedback)
+        current_feedback = give_feedback(convert_code_to_color(code))
+        current_colored_pegs = current_feedback.count("red peg")
+        current_white_pegs = current_feedback.count("white peg")
+        
+        expected_colored_pegs = expected_feedback.count("red peg")
+        expected_white_pegs = expected_feedback.count("white peg")
+
+        current_colored_pegs == expected_colored_pegs && current_white_pegs == expected_white_pegs
+    end
+
 
 end
 
