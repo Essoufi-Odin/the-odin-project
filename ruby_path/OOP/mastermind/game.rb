@@ -6,12 +6,11 @@ class Game
     attr_reader :codemaker_colors, :colors_to_choose_from
 
     @@colors_to_choose_from = ["green", "yellow", "blue", "orange", "red", "white"]
-    @@win = ["red peg", "red peg", "red peg", "red peg"]
 
     def initialize
         @player = Player.new
         @computer = Computer.new
-        
+        @win = ["red peg", "red peg", "red peg", "red peg"]
     end
 
     def start
@@ -42,43 +41,45 @@ class Game
     def play_as_codebreaker
        
         select_color_4_times()
+        computer_choice = self.computer.selected_colors
         12.times do
-            # p self.computer.selected_colors uncomment if you want to cheat the computer
+            # uncomment below if you want to cheat the computer
+            # p computer_choice
             puts "colors to choose from are #{@@colors_to_choose_from} "
             player_colors_array = get_player_colors()
-            feedback = give_feedback(player_colors_array) 
+            player_colors_array
+            feedback = give_feedback(player_colors_array, computer_choice) 
             p feedback 
-            if feedback == @@win
+            if feedback == @win
                 puts "you guessed correctly! "
-                break
-            end 
-              
+                return   
+            end               
         end
         puts "you reached maximum amount of guessed. you lose! "
     end
 
     def play_as_codemaker
-        all_possible_codes = generate_codes()
-        player_choice = get_player_colors()
-        computer_colors_array = convert_code_to_color(1122)
-        feedback = give_feedback_computer(computer_colors_array, player_choice) 
-        all_possible_codes.select! { |code| feedback_match?(convert_code_to_color(code), feedback) }
-        if feedback == @@win
-            puts "you guessed correctly! "
+        player_choice = convert_colors_to_code(get_player_colors())
+        computer_colors_array = ["1", "1", "2", "2"]
+        possible_codes = generate_codes()
+        feedback = give_feedback(computer_colors_array, player_choice) 
+        if feedback == @win
+            puts "computer guessed correctly from first try "
             return
-        end 
-        all_possible_codes.select! { |code| feedback_match?(code, feedback) }
+        end
+        eliminate_codes( possible_codes, computer_colors_array, feedback)
+        count = 1
         11.times do
-            best_guess = find_best_guess(all_possible_codes)
-            puts "Computer's guess: #{convert_code_to_color(best_guess)}"
+            p possible_codes.first.split("")
+            best_guess = possible_codes.first.split("")
             
-            feedback = give_feedback(best_guess)
-            all_possible_codes.select! { |code| feedback_match?(convert_code_to_color(code), feedback) }
-        
-            if feedback == @@win
-              puts "Computer guessed correctly!"
-              return
+            feedback = give_feedback(best_guess, player_choice)
+            if feedback == @win
+                puts "computer guessed after #{count} tries "
+                return
             end
+            eliminate_codes( possible_codes, best_guess, feedback)
+            count += 1
         end
         
           puts "Computer reached the maximum number of guesses. It loses!"
@@ -91,30 +92,24 @@ class Game
         end
     end
 
-    def give_feedback(player_colors_array)
+    def give_feedback(guess, choice)
         feedback = []
-        player_colors_array.each_with_index do |color, index|
-            if self.computer.selected_colors[index] == player_colors_array[index] 
+        guess.each_with_index do |color, index|
+            if choice[index] == guess[index] 
               feedback << "red peg"
-            elsif self.computer.selected_colors.include?(color)
+            elsif guess.include?(color)
               feedback << "white peg"
             end
         end
         feedback
     end
 
-    def give_feedback_to_computer(computer_colors_array, player_choice)
-        feedback = []
-        computer_colors_array.each_with_index do |color, index|
-            if player_choice[index] == computer_colors_array[index] 
-              feedback << "red peg"
-            elsif player_choice.include?(color)
-              feedback << "white peg"
-            end
-        end
-        feedback
+    def convert_colors_to_code(colors)
+        code = ''
+        colors.each { |color| code += (@@colors_to_choose_from.find_index(color) + 1).to_s }
+        code
     end
-
+    
     def get_player_colors
         puts "| 1 | 2 | 3 | 4 |"
         puts "enter color accoridng to position sperated by spaces "
@@ -134,7 +129,7 @@ class Game
     end
 
     def generate_codes
-        #create set of the 1296 possible codes
+        #create set of all the possible codes
         colors = (1..6).to_a
         all_combinations = []
         colors.each do |a|
@@ -150,31 +145,12 @@ class Game
         all_combinations
     end
 
-    def convert_code_to_color(code)
-        
-      color = code.to_s.split("").map { |num| @@colors_to_choose_from[num.to_i - 1] }
-        
+    def eliminate_codes(possible_codes, guess, feedback)
+        possible_codes.reject! do |code|
+            give_feedback(guess, code) != feedback
+        end
     end
-
-
-    def convert_colors_to_code(colors)
-        code = ''
-        colors.each {|color|code += @@colors_to_choose_from.find_index(color).to_s}
-        code
-    end
-
-    def feedback_match?(code, expected_feedback)
-        current_feedback = give_feedback(convert_code_to_color(code))
-        current_colored_pegs = current_feedback.count("red peg")
-        current_white_pegs = current_feedback.count("white peg")
-        
-        expected_colored_pegs = expected_feedback.count("red peg")
-        expected_white_pegs = expected_feedback.count("white peg")
-
-        current_colored_pegs == expected_colored_pegs && current_white_pegs == expected_white_pegs
-    end
-
-
+    
 end
 
 game = Game.new

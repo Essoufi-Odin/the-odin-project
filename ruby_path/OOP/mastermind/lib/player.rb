@@ -10,7 +10,4 @@ class Player
         gets.chomp
     end
 
-    def select_position
-        gets.chomp.to_i
-    end
 end
